@@ -1,0 +1,7 @@
+
+Task3/data/tast3_snli_1.0/README.txt
+Task3/data/tast3_snli_1.0/snli_1.0_dev.jsonl
+Task3/data/tast3_snli_1.0/snli_1.0_dev.txt
+*.txt
+Task3/data/tast3_snli_1.0/snli_1.0_test.jsonl
+Task3/data/tast3_snli_1.0/snli_1.0_train.jsonl
