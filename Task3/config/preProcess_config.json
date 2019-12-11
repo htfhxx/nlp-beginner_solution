@@ -1,0 +1,13 @@
+{
+"data_train_dir" : "data\\snli\\snli_1.0_train.txt",
+"data_dev_dir" : "data\\snli\\snli_1.0_dev.txt",
+"embedding_file_dir" : "data\\embedding\\glove.6B.50d.txt",
+
+"worddict_dir" : "data\\worddict.txt",
+"data_train_str_dir" : "data\\train_data_str.pkl",
+"data_train_id_dir" : "data\\train_data_id.pkl",
+"data_dev_str_dir" : "data\\dev_data_str.pkl",
+"data_dev_id_dir" : "data\\dev_data_id.pkl",
+
+"embedding_matrix_dir" : "data\\embedding_matrix.pkl"
+}

@@ -15,3 +15,13 @@
 
 
 
+
+
+
+
+预处理：
+
+```
+python dataProcess.py --config config/preProcess_config.json
+```
+

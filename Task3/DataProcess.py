@@ -1,14 +1,10 @@
 import pickle
 import numpy as np
 import string
+import argparse
+import json
 
-data_train_dir = "data\\snli\\snli_1.0_train.txt"
-embedding_file_dir = "data\\embedding\\glove.6B.50d.txt"
 
-worddict_dir = "data\\worddict.txt"
-data_train_str_dir = "data\\train_data_str.pkl"
-data_train_id_dir = "data\\train_data_id.pkl"
-embedding_matrix_dir = "data\\embedding_matrix.pkl"
 
 class DataProcess(object):
 
@@ -32,7 +28,7 @@ class DataProcess(object):
                 "labels": labels}
 
 
-    def build_worddict(self,data):
+    def build_worddict(self,data,worddict_dir):
         words = []
         words.extend(["_PAD_", "_OOV_", "_BOS_", "_EOS_"])
         for sentence in data["premise"]:
@@ -79,9 +75,9 @@ class DataProcess(object):
             hypothesis_id.append(self.sentence2idList(data["hypothesis"][i], word_id))
             labels_id.append(labels_map[label])
 
-        return {"premise_id": premise_id,
-                "hypothesis_id": hypothesis_id,
-                "labels_id": labels_id}
+        return {"premises": premise_id,
+                "hypothesis": hypothesis_id,
+                "labels": labels_id}
 
 
     def build_embeddings(self,embedding_file, word_id):
@@ -111,23 +107,59 @@ class DataProcess(object):
         return embedding_matrix
 
 if __name__ == '__main__':
-    data_processor= DataProcess()
+
+	#配置文件地址
+	default_config="config\\preProcess_config.json"
+	
+	#命令行参数
+	parser=argparse.ArgumentParser(description='config of dataset preprocess!')
+	parser.add_argument("--config", default=default_config)
+	args=parser.parse_args()
+	
+	#读取配置文件
+	with open(args.config,'r') as f:
+		config=json.load(f)
+		
+	#配置文件中读取配置
+	data_train_dir = config["data_train_dir"]
+	data_dev_dir = config["data_dev_dir"]
+	embedding_file_dir =  config["embedding_file_dir"]
+
+	worddict_dir =  config["worddict_dir"]
+	data_train_str_dir =  config["data_train_str_dir"]
+	data_train_id_dir =  config["data_train_id_dir"]
+	data_dev_str_dir =  config["data_dev_str_dir"]
+	data_dev_id_dir =  config["data_dev_id_dir"]
+	embedding_matrix_dir =  config["embedding_matrix_dir"]
+
+
+	print("-"*30,"starting preprocessing data!","-"*30)
+	
+	data_processor= DataProcess()
 
     # 读取数据
-    data_str = data_processor.read_data(data_dir=data_train_dir)
+	data_str = data_processor.read_data(data_dir=data_train_dir)
+	data_dev_str = data_processor.read_data(data_dir=data_dev_dir)
     # 构建词典
-    word_id, id_word = data_processor.build_worddict(data_str)
+	word_id, id_word = data_processor.build_worddict(data_str,worddict_dir)
     # 清洗数据并转换为id
-    data_id = data_processor.data2id(data_str, word_id)
+	data_id = data_processor.data2id(data_str, word_id)
+	data_id_dev = data_processor.data2id(data_dev_str, word_id)
 
     # 保存 data_train_str和data_train_id
-    with open(data_train_str_dir, "wb") as f:
-        pickle.dump(data_str, f)
-    with open(data_train_id_dir, "wb") as f:
-        pickle.dump(data_id, f)
-
-    embedding_matrix = data_processor.build_embeddings(embedding_file_dir, word_id)
-    print("embedding_matrix size: %d" % len(embedding_matrix))
-
-    with open(embedding_matrix_dir, "wb") as f:
-        pickle.dump(embedding_matrix, f)
+	with open(data_train_str_dir, "wb") as f:
+		pickle.dump(data_str, f)
+	with open(data_train_id_dir, "wb") as f:
+		pickle.dump(data_id, f)
+	with open(data_dev_str_dir, "wb") as f:
+		pickle.dump(data_dev_str, f)
+	with open(data_dev_id_dir, "wb") as f:
+		pickle.dump(data_id_dev, f)
+	
+	#embedding矩阵的生成和保存
+	embedding_matrix = data_processor.build_embeddings(embedding_file_dir, word_id)
+	print("embedding_matrix size: %d" % len(embedding_matrix))
+	with open(embedding_matrix_dir, "wb") as f:
+		pickle.dump(embedding_matrix, f)
+		
+	print("-"*30,"preprocessing data finished!","-"*30)	
